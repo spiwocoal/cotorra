@@ -1,6 +1,6 @@
 # Build image
 # Necessary dependencies to build Parrot
-FROM rustlang/rust:nightly-bullseye-slim as build
+FROM rust:slim-bullseye as build
 
 RUN apt-get update && apt-get install -y \
     build-essential autoconf automake cmake libtool libssl-dev pkg-config
@@ -11,10 +11,11 @@ WORKDIR "/parrot"
 RUN mkdir src
 RUN echo "fn main() {}" > src/main.rs
 COPY Cargo.toml ./
-RUN cargo +nightly build --release -Z sparse-registry
+COPY Cargo.lock ./
+RUN cargo build --release --locked
 
 COPY . .
-RUN cargo +nightly build --release -Z sparse-registry
+RUN cargo build --release --locked
 
 # Release image
 # Necessary dependencies to run Parrot
